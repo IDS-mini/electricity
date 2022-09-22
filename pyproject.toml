@@ -10,6 +10,9 @@ fastapi = "^0.85.0"
 scipy = "^1.9.1"
 scikit-learn = "^1.1.2"
 pandas = "^1.5.0"
+uvicorn = "^0.18.3"
+Jinja2 = "^3.1.2"
+invoke = "^1.7.1"
 
 [tool.poetry.dev-dependencies]
 ipykernel = "^6.15.3"
