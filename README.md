@@ -1,5 +1,11 @@
 # Electricity Price Estimator
 
-### Install instructions for poetry
+## Installation
 
-poetry install
+### Install dependencies
+
+`poetry install`
+
+### Start Web application
+
+`poetry run invoke app`
