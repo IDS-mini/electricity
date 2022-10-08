@@ -5,8 +5,15 @@ from fastapi.templating import Jinja2Templates
 import pandas as pd
 import numpy as np
 from datetime import timedelta
+import xgboost as xgb
 
 app = FastAPI()
+
+ENABLE_MACHINE_LEARNING = True
+
+if ENABLE_MACHINE_LEARNING:
+    model = xgb.XGBRegressor()
+    model.load_model('../models/xgboost_model.ubj')
 
 app.mount("/static", StaticFiles(directory="src/app/static"), name="static")
 templates = Jinja2Templates(directory="src/app/templates")
@@ -24,6 +31,9 @@ def plan():
     date_range = pd.date_range(
         start=now_ceil, end=now_ceil+timedelta(days=3), freq="H")
     df = pd.DataFrame({'date': date_range})
+    if ENABLE_MACHINE_LEARNING:
+        # XGBOOST Prediction
+        pass
     df['value'] = np.random.normal(1, 1, len(df))
 
     def get_recommendation(x):
