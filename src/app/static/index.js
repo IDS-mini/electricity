@@ -26,8 +26,11 @@ function generatePlan() {
             pricecell.className = 'has-background-success has-text-white';
             pricecell.innerHTML = recommendations[2];
           }
+          indexcell = document.createElement('td');
+          indexcell.innerHTML = String(item.value).slice(0, 3);
           row.appendChild(datecell);
           row.appendChild(pricecell);
+          row.appendChild(indexcell);
           tableBody.appendChild(row);
         });
       }

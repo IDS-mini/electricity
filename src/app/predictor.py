@@ -21,9 +21,9 @@ def create_features(df):
 
 
 def get_recommendation(x):
-    if x > 1.3:
+    if x > 1.2:
         return '-'
-    elif x < -0.7:
+    elif x < 0.8:
         return '+'
     else:
         return '0'
