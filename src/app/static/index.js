@@ -1,99 +1,37 @@
-var canvas = document.getElementById('canvas');
-var context = canvas.getContext('2d');
-canvas.width = 280;
-canvas.height = 280;
+const plan = document.getElementById('plan');
+const main = document.getElementById('main');
+const recommendations = ['Restrict', 'Maintain', 'Boost'];
 
-var Mouse = { x: 0, y: 0 };
-var lastMouse = { x: 0, y: 0 };
-context.fillStyle = 'black';
-context.fillRect(0, 0, canvas.width, canvas.height);
-context.color = 'white';
-context.lineWidth = 18;
-context.lineJoin = context.lineCap = 'round';
-
-canvas.addEventListener(
-  'mousemove',
-  function (e) {
-    lastMouse.x = Mouse.x;
-    lastMouse.y = Mouse.y;
-
-    Mouse.x = e.pageX - this.offsetLeft - 15;
-    Mouse.y = e.pageY - this.offsetTop - 15;
-  },
-  false
-);
-
-canvas.addEventListener(
-  'mousedown',
-  function (e) {
-    canvas.addEventListener('mousemove', onPaint, false);
-  },
-  false
-);
-
-canvas.addEventListener(
-  'mouseup',
-  function () {
-    canvas.removeEventListener('mousemove', onPaint, false);
-  },
-  false
-);
-
-var onPaint = function () {
-  context.lineWidth = context.lineWidth;
-  context.lineJoin = 'round';
-  context.lineCap = 'round';
-  context.strokeStyle = context.color;
-
-  context.beginPath();
-  context.moveTo(lastMouse.x, lastMouse.y);
-  context.lineTo(Mouse.x, Mouse.y);
-  context.closePath();
-  context.stroke();
-};
-
-function reset() {
-  context.clearRect(0, 0, 280, 280);
-  context.fillStyle = 'black';
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  document.querySelector('#result').innerText = '';
-}
-
-function randomImage() {
-  fetch('/randomkuva')
+function generatePlan() {
+  fetch('/plan')
     .then((response) => response.json())
     .then((data) => {
-      const mycanvas = document.getElementById('canvas');
-      const mycontext = mycanvas.getContext('2d');
-      const img = new Image();
-      img.addEventListener(
-        'load',
-        () => {
-          mycontext.drawImage(img, 0, 0, 28, 28, 0, 0, 280, 280);
-        },
-        false
-      );
-      img.src = 'data:image/png;base64,' + data.kuva;
-      document.getElementById('result').innerText =
-        'Tunnistettu numero: ' + data.tunnistus + 'Oikea numero: ' + data.arvo;
-    });
-}
-
-function predict() {
-  const data = canvas.toDataURL();
-  const response = fetch('/predict', { method: 'POST', body: data })
-    .then((response) => response.json())
-    .then((json) => {
-      document.getElementById('result').innerText =
-        'Tunnistettu numero: ' + json.numero;
-      const img = new Image();
-      img.addEventListener(
-        'load',
-        () => {
-          context.drawImage(img, 0, 0, 28, 28, 0, 0, 280, 280);
-        },
-        false
-      );
-      img.src = 'data:image/png;base64,' + json.kuva;
+      const tableBody = document.getElementById('table-body');
+      if (data.length) {
+        data.forEach((item) => {
+          row = document.createElement('tr');
+          datecell = document.createElement('td');
+          datetime = new Date(item.date);
+          datecell.innerHTML = datetime.toLocaleString().slice(0, -3);
+          pricecell = document.createElement('td');
+          if (item.recommendation == '-') {
+            pricecell.className = 'has-background-danger has-text-white';
+            pricecell.innerHTML = recommendations[0];
+          }
+          if (item.recommendation == '0') {
+            pricecell.className = 'has-background-warning';
+            pricecell.innerHTML = recommendations[1];
+          }
+          if (item.recommendation == '+') {
+            pricecell.className = 'has-background-success has-text-white';
+            pricecell.innerHTML = recommendations[2];
+          }
+          row.appendChild(datecell);
+          row.appendChild(pricecell);
+          tableBody.appendChild(row);
+        });
+      }
+      plan.style.display = 'block';
+      main.style.display = 'none';
     });
 }
