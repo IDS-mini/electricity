@@ -11,7 +11,7 @@ function generatePlan() {
         data.forEach((item) => {
           row = document.createElement('tr');
           datecell = document.createElement('td');
-          datetime = new Date(item.date);
+          datetime = new Date(item.datetime);
           datecell.innerHTML = datetime.toLocaleString().slice(0, -3);
           pricecell = document.createElement('td');
           if (item.recommendation == '-') {
