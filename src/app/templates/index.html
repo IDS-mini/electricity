@@ -22,27 +22,37 @@
 		</header>
 		<main class="section" id="main">
 			<div class="container">
-				<h1 class="title">Welcome</h1>
-				<p>Welcome to the Electricity Usage Optimizer! Click the link below to get
-					started.
+				<h1 class="title">The Electricity Usage Optimizer helps you to save on your electricity bills</h1>
+				<p class = "my-2">Charing a car, drying laundry, heating your home? With hourly-rates swinging fiercely, some planning on your upcoming consumption can save
+					you a lot of money. The Electricity Usage Optimizer helps you to plan your electricity consumption.
 				</p>
-				<div>
-				<a class="button is-link" onclick="generatePlan()">Generate Plan</a>
-				</div>
+				<p class="my-2">If you can plan and shift your electricity needs within in the next days, we will show you the best times to use the electricity -
+					and when to definitely turn the costly gadgets off.
+				</p>
+				<a class="button is-link" href="planning">Show me the forecast!</a>
 			</div>
 		</main>
-		<section class="section" id="plan" style="display: none;">
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Date and time</th>
-					  <th>Recommendation</th>
-						<th>Price index</th>
-					</tr>
-				</thead>
-				<tbody id="table-body">
-				</tbody>
-			</table>	
+		<section class="section" id="why">
+			<div class="container">
+				<h2 class="title">You won't only save on your own bill. With your help, others will save too!</h2>
+				<p class = "my-2">Cutting the total consumption during the peak hours <a href="https://www.hs.fi/talous/art-2000009051566.html">may have an extensive effect on the prices</a> (article in Finnish). When the electricity production is at its limits, every new unit of production costs more than the previous one. This increasing
+					marginal cost phenomenon has an upside: it really is benefical to reduce peak-time consumption. When planning your consumption wisely,
+				you will save on your bills but your neighbor will save on theirs too. 
+				</p>
+				<img src="{{url_for('static', path='plug.jpeg')}}" alt="A plug">
+			</div>
+		</section>
+		<section class="section" id="correlations">
+			<div class="container">
+				<h2 class="title">Predictions during unusual times?</h2>
+				<p class = "my-2"> Simply put: yes. The current electricity prices may be at a level we are not use to see. But that does not make all correlations vanish. Routines in societies affect
+					the total consumption: factories and industrial production run with their weekly routines, weather increases or decreases our demand for heating and wind boosts the power production.
+				</p>
+				<p class = "my-2">
+					There are still familiar and predictable components that give us useful insight on the coming days. And because the prices can be a vast burden for households with considerable
+					consumption and our society, these insights are now needed more than ever.
+				</p>
+			</div>
 		</section>
 		<footer class="footer">
 			<div class="content has-text-centered">

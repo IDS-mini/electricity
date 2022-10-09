@@ -17,7 +17,6 @@ templates = Jinja2Templates(directory="src/app/templates")
 def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-
 @app.get("/plan")
 def plan():
     if ENABLE_MACHINE_LEARNING:
@@ -25,3 +24,11 @@ def plan():
         return predictor.forecast()
     else:
         return predictor.fake_forecast()
+
+@app.get("/about", response_class=HTMLResponse)
+def read_root(request: Request):
+    return templates.TemplateResponse("about.html", {"request": request})
+
+@app.get("/planning", response_class=HTMLResponse)
+def read_root(request: Request):
+    return templates.TemplateResponse("planning.html", {"request": request})

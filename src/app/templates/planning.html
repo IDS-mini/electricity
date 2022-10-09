@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Electricity Usage Optimizer</title>
+	<link rel="stylesheet" href="{{url_for('static', path='bulma.min.css')}}">
+</head>
+
+<body onload="generatePlan()">
+		<header class="hero is-small is-link">
+			<a class="hero-body" href="/">
+				<div class="level is-justify-content-start">
+					<img src="{{url_for('static', path='logo-electron.svg')}}" width="50px" alt="logo-electron" style="filter: invert(95%);">
+					<p class="title">
+						Electricity Usage Optimizer
+					</p>	
+				</div>
+				<p class="subtitle">
+					Build a Daily Optimization Plan for Your Use of Electricity!
+				</p>
+			</a>
+		</header>
+		<section class="section" id="plan" style="display: none;">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Date and time</th>
+					  <th>Recommendation</th>
+						<th>Price index</th>
+					</tr>
+				</thead>
+				<tbody id="table-body">
+				</tbody>
+			</table>	
+		</section>
+		<footer class="footer">
+			<div class="content has-text-centered">
+				<p>
+					<strong>Electricity Usage Optimizer</strong> by <a href="https://github.com/IDS-mini/electricity">IDS-mini</a>.
+					The source code is licensed
+					<a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content
+					is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.<br/>
+					This is our group project for the course Introduction to Data Science at University of Helsinki, Fall 2022.
+				</p>
+			</div>
+		</footer>
+	  <script src="{{url_for('static',path='index.js')}}"></script>
+</body>
+</html>
