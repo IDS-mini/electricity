@@ -3,11 +3,12 @@ import io
 import pandas as pd
 import os
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 apikey = os.getenv('FING_API_KEY')
 
-def get_consumption(datetime_start, datetime_end):
+def get_consumption_raw(datetime_start, datetime_end):
     '''Input time format: python datetime in UTC
     Returns: Pandas DataFrame'''
 
@@ -28,5 +29,15 @@ def get_consumption(datetime_start, datetime_end):
 
     return df
 
+def get_consumption_trimmed(datetime_start, datetime_end):
+    df = get_consumption_raw(datetime_start, datetime_end)
+    df.columns = ['a','b','c','d','e']
+    df.drop(['b','c','d'], axis=1, inplace=True)
+    df.columns = ['datetime','Consumption_MWh']
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df.set_index('datetime', inplace=True)
+
+    return df
+
 #test printing:
-#print(get_consumption(datetime.datetime.now()-datetime.timedelta(days=1), datetime.datetime.now()))
+#print(get_consumption_trimmed(datetime.datetime.now()-datetime.timedelta(days=1), datetime.datetime.now()))
