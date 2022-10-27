@@ -4,6 +4,7 @@ on: workflow_dispatch
 
 env:
   FING_API_KEY: ${{ secrets.FING_API_KEY }}
+  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
 jobs:
   build:
