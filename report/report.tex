@@ -71,14 +71,28 @@ Features extracted for the model were:
 \subsection{Gathering the Data for the Prediction}
 \label{subsection:datafilling}
 
-Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts that should give a best estimate of the values.
+Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts that should give a best estimate of the values (See figure \ref{fig:consumption}).
 
-
+\begin{figure}
+    \centering
+    \includegraphics[width=15cm]{report/images/consumption.png}
+    \caption{Time series for Consumption in MWh with historical data in red and the forecast in orange.}
+    \label{fig:consumption}
+\end{figure}
 
 \subsection{Time Series Prediction with XGBoost}
 \label{subsection:xgboost}
 
 The ML model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. It was found to be very fast to train and very accurate.
+
+When training the forecasts, we used cross validation with time series splits (See figure \ref{fig:ts-cross-validation}).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=15cm]{report/images/ts-cross-validation.png}
+    \caption{Cross validation using Time Series Splits with each split being a year.}
+    \label{fig:ts-cross-validation}
+\end{figure}
 
 
 
