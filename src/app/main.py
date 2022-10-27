@@ -20,8 +20,11 @@ def read_root(request: Request):
 @app.get("/plan")
 def plan():
     if ENABLE_MACHINE_LEARNING:
-        # XGBOOST Prediction
-        return predictor.forecast()
+        # Try to get latest saved prediction, if not succeed, create a new XGBOOST Prediction
+        latest = predictor.get_latest_forecast()
+        if latest is not None:
+            return latest
+        return predictor.forecast(add_dayahead=True)
     else:
         return predictor.fake_forecast()
 
