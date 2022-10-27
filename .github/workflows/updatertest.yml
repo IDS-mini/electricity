@@ -26,7 +26,7 @@ jobs:
           git add forecast_data/forecasts.csv
           git commit -m "Forecast update"
       - name: Push updated forecast
-        uses: ad-m/github-push-action@py-scripts
+        uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.ACCESS_TOKEN }}
           force: true
