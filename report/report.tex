@@ -58,19 +58,29 @@ All data used for our purpose is publicly available. No data subject to the GDPR
 \label{section:analysis}
 
 %% target value
+\subsection{Feature Extraction}
+\label{subsection:extraction}
+
+Features extracted for the model were:
+
+'WindMWh', 'ConsumptionMWh', 'pressure', 'rain', 'humidity',
+
+'temperature', 'wind' and the target value was 'price'.
+
+
+\subsection{Gathering the Data for the Prediction}
+\label{subsection:datafilling}
+
+Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts that should give a best estimate of the values.
+
+
 
 \subsection{Time Series Prediction with XGBoost}
 \label{subsection:xgboost}
 
 The ML model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. It was found to be very fast to train and very accurate.
 
-\subsection{Feature Extraction}
-\label{subsection:extraction}
 
-\subsection{Gathering the Data for the Prediction}
-\label{subsection:datafilling}
-
-Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts that should give a best estimate of the values.
 
 \section{Delivering Results for the End User}
 \label{section:delivery}
