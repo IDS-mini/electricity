@@ -1,0 +1,23 @@
+name: Updater
+
+on:
+  schedule:
+    - cron:  '30 09 * * 4' #run every thursday at 9:30GMT
+
+env:
+  FING_API_KEY: ${{ secrets.FING_API_KEY }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.10.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.6
+      - name: Install backend dependencies
+        run: poetry install
+      - name: Update price forecasts
+        run: python3 src/app/update_forecast.py
