@@ -25,6 +25,4 @@ jobs:
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
       - run: poetry install
       - name: Update price forecasts
-        run: |
-          source .venv/bin/activate
-          python src/app/update_forecast.py
+        run: poetry run python src/app/update_forecast.py
