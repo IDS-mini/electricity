@@ -4,9 +4,9 @@ import pandas as pd
 import numpy as np
 import datetime
 from xgboost import XGBRegressor
-from data import fetch_weather
-from data import fetch_day_ahead
-from data import fetch_consumption
+from utils import fetch_weather
+from utils import fetch_day_ahead
+from utils import fetch_consumption
 
 
 def create_features(df):
@@ -37,10 +37,10 @@ def get_recommendation(x):
 class Predictor:
     def __init__(self):
         self._model = XGBRegressor()
-        self._model.load_model('../../models/xgboost_model.ubj')
-        wind = pd.read_parquet('../../future_data/wind.parquet')
-        consumption = pd.read_parquet('../../future_data/consumption.parquet')
-        weather = pd.read_parquet('../../future_data/weather.parquet')
+        self._model.load_model('models/xgboost_model.ubj')
+        wind = pd.read_parquet('future_data/wind.parquet')
+        consumption = pd.read_parquet('future_data/consumption.parquet')
+        weather = pd.read_parquet('future_data/weather.parquet')
         self.data = wind.join(consumption).join(weather).tz_localize(tz='UTC')
 
     def add_fresh_data(self, df):
@@ -85,7 +85,7 @@ class Predictor:
         future_df['recommendation'] = future_df['value'].apply(get_recommendation)
         RETURNED_FEATURES = ['value', 'recommendation']
         future_df = future_df[now_ceil:][RETURNED_FEATURES].reset_index()
-        future_df.to_csv('../../forecast_data/forecasts.csv')
+        future_df.to_csv('forecast_data/forecasts.csv')
         return future_df.to_dict(orient='records')
 
     def fake_forecast(self):
@@ -100,11 +100,7 @@ class Predictor:
 
     def get_latest_forecast(self):
         try:
-            df = pd.read_csv('../../forecast_data/forecasts.csv')
+            df = pd.read_csv('forecast_data/forecasts.csv')
             return df.to_dict('records')
         except:
             return None
-
-
-predictor = Predictor()
-predictor.forecast(add_dayahead=True)
