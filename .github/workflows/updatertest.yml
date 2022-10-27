@@ -1,9 +1,13 @@
 name: Updatertest
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 */12 * * *' #run twice a day
 
 env:
   FING_API_KEY: ${{ secrets.FING_API_KEY }}
+  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
 jobs:
   build:
@@ -16,6 +20,17 @@ jobs:
         with:
           python-version: 3.10.6
       - name: Install dependencies
-        run: pip install numpy>=1.21.0 pandas==1.5.0 scipy==1.9.1 scikit-learn==1.1.2 xgboost==1.6.2 python-dotenv==0.10.4 fmiopendata bs4
+        run: pip install -r requirements.txt
       - name: Update forecasts
         run: python src/app/update_forecast.py
+      - name: Commit changes
+        run: |
+          git config --local user.name "forecaster"
+          git add forecast_data/forecasts.csv
+          git commit -m "Forecast update"
+      - name: Push updated forecast
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.ACCESS_TOKEN }}
+          branch: ${{ github.ref }}
+          force: true
