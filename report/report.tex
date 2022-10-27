@@ -24,14 +24,10 @@ The rest of the report is composed as follows: the data used and data preprocess
 \label{subsection:datadescription}
 
 \begin{enumerate}
-    \item Fingrid: Wind Power Production Data
+    \item Fingrid: Wind Power Production and Total Consumption Data
     
     https://data.fingrid.fi/en
-    
-    \item Helen District Heating Power Data
-    
-    https://www.helen.fi/en/company/responsibility/current-topics/open-data
-    
+        
     \item Entsoe Day-ahead Market price history and current prices
     
     https://transparency.entsoe.eu
@@ -42,12 +38,17 @@ The rest of the report is composed as follows: the data used and data preprocess
     
 \end{enumerate}
 
-The data for all sources mentioned above is available publicly in CSV format. We chose to downlaod data spanning from the beginning of 2019 as far ahead as possible. For Helen, the data ends at the end of year 2021. For predictions, we are fetching the most recent data in addition.
+The data for all sources mentioned above is available publicly in CSV format.
+We chose to downlaod data spanning from the beginning of 2019 as far ahead as possible.
+For predictions, we are additionally fetching the most recent data.
 
 \subsection{Exploratory Data Analysis and Data Preprocessing}
 \label{subsection:eda}
 
-We created Jupyter Notebooks for all data sources to clean and process the data. The products of this process was datasets with the datetime field as index. Two separate tables were created for each data source - historical and a time series forecast. The historical data is used for training the model, and the forecast combined with available amendments from APIs to construct the final predicted price.
+We created Jupyter Notebooks for all data sources to clean and process the data.
+The products of this process was datasets with the datetime field as index.
+Two separate datasets were created for each data source - historical and a time series forecast.
+The historical data is used for training the model, and the forecast combined with available amendments from APIs to construct the final predicted price.
 
 \subsection{Data Warehousing and Data Protection}
 \label{subsection:wareousing}
