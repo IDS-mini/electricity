@@ -1,8 +1,7 @@
 name: Updatertest
 
-on:
-  schedule:
-    - cron:  '20 * * * *' #run every 20min
+on: workflow_dispatch
+
 
 env:
   FING_API_KEY: ${{ secrets.FING_API_KEY }}
