@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{amsmath}
 
 \begin{document}
 
@@ -22,19 +23,36 @@ The rest of the report is composed as follows: the data used and data preprocess
 \subsection{Data Used in the Project}
 \label{subsection:datadescription}
 
-%% list of used data w/ links to sources
+\begin{enumerate}
+    \item Fingrid: Wind Power Production Data
+    
+    https://data.fingrid.fi/en
+    
+    \item Helen District Heating Power Data
+    
+    https://www.helen.fi/en/company/responsibility/current-topics/open-data
+    
+    \item Entsoe Day-ahead Market price history and current prices
+    
+    https://transparency.entsoe.eu
+    
+    \item Finnish Meteorological Institute Weather Observation Data for Kumpula, Helsinki.
+    
+    https://en.ilmatieteenlaitos.fi/open-data
+    
+\end{enumerate}
+
+The data for all sources mentioned above is available publicly in CSV format. We chose to downlaod data spanning from the beginning of 2019 as far ahead as possible. For Helen, the data ends at the end of year 2021. For predictions, we are fetching the most recent data in addition.
 
 \subsection{Exploratory Data Analysis and Data Preprocessing}
 \label{subsection:eda}
 
-%% description of eda findings and how data was preprocessed and integrated
+We created Jupyter Notebooks for all data sources to clean and process the data. The products of this process was datasets with the datetime field as index. Two separate tables were created for each data source - historical and a time series forecast. The historical data is used for training the model, and the forecast combined with available amendments from APIs to construct the final predicted price.
 
 \subsection{Data Warehousing and Data Protection}
 \label{subsection:wareousing}
 
-%% data publicly available
-%% both data used for preprocessing and preprocessed data are in version control
-%% no gdpr data used
+All data used for our purpose is publicly available. No data subject to the GDPR act is used, since we are not collecting any data for individuals.
 
 \section{Data Analysis}
 \label{section:analysis}
@@ -44,9 +62,7 @@ The rest of the report is composed as follows: the data used and data preprocess
 \subsection{Time Series Prediction with XGBoost}
 \label{subsection:xgboost}
 
-
-
-%% description of used method (linear regression, xgboost)
+The ML model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. It was found to be very fast to train and very accurate.
 
 \subsection{Feature Extraction}
 \label{subsection:extraction}
@@ -54,15 +70,30 @@ The rest of the report is composed as follows: the data used and data preprocess
 \subsection{Gathering the Data for the Prediction}
 \label{subsection:datafilling}
 
-%% how the historical data needs to be filled in to get the prediction
+Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts that should give a best estimate of the values.
 
 \section{Delivering Results for the End User}
 \label{section:delivery}
 
-The delivery of results for the end user are described here. Chapter 
+We calculate a simple moving average (SMA) of the electricity price with a window of 168 hours (7 days) to create a reference price point. For each prediction time, we compare the predicted or known price to the index via equation \ref{eq:index}.
+
+
+\begin{equation} \label{eq:index}
+\text{"Price Index"}_i = \frac{\text{SMA}_i}{\text{"Predicted Price"}_i}
+\end{equation}
+
+The price index is then classified as follows:
+
+\begin{enumerate}
+    \item $\text{"Price Index"}_i < 0.8$ : "Boost"
+    \item $0.8 \leq \text{"Price Index"}_i \leq 1.2$ : "Maintain"
+    \item $\text{"Price Index"}_i > 1.2$ : "Restrict"
+\end{enumerate}
 
 \subsection{Web Application}
 \label{subsection:server}
+
+Our deliverable is a web application built with FastAPI that serves a landing page and a page for planning. The plan page shows a table with hourly times for the next 36 hours with a recommendation and the price index. The whole package is available on Github at https://github.com/IDS-mini/electricity .
 
 \subsection{Visualization and User Experience}
 \label{subsection:ux}
