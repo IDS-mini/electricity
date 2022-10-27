@@ -16,6 +16,6 @@ jobs:
         with:
           python-version: 3.10.6
       - name: Install dependencies
-        run: pip install numpy pandas xgboost dotenv fmiopendata bs4
+        run: pip install numpy pandas xgboost python-dotenv fmiopendata bs4
       - name: Update forecasts
         run: python src/app/update_forecast.py
