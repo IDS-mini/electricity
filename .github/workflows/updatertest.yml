@@ -31,6 +31,10 @@ jobs:
       - name: Install dependencies
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      - name: Install xgboost again
+        run: |
+          source .venv/bin/activate
+          pip install xgboost
       - name: Update price forecasts
         run: |
           source .venv/bin/activate
