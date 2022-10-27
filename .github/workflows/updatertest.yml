@@ -19,3 +19,13 @@ jobs:
         run: pip install -r requirements.txt
       - name: Update forecasts
         run: python src/app/update_forecast.py
+      - name: Commit changes
+        run: |
+          git config --local user.name "forecaster"
+          git add forecast_data/forecasts.csv
+          git commit -m "Forecast update"
+      - name: Push updated forecast
+        uses: ad-m/github-push-action@py-scripts
+        with:
+          github_token: ${{ secrets.ACCESS_TOKEN }}
+          force: true
