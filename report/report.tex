@@ -9,6 +9,8 @@
 
 \tableofcontents
 
+\vspace{30.0 cm}
+
 \section{A Simple Prediction of Electricity Price Development}
 \label{section:introduction}
 
@@ -21,25 +23,30 @@ The rest of the report is composed as follows: the data used and data preprocess
 \section{Data}
 \label{section:data}
 
+In order to produce the prediction, several sets of historical data were used. The data sets are described in Subchapter \ref{subsection:datadescription} and comments on the data exploration and preprocessing in Subchapter \ref{subsection:eda}. Data storaging and protection are reported in Subchapter \ref{subsection:warehousing}.
+
 \subsection{Data Used in the Project}
 \label{subsection:datadescription}
 
-\begin{enumerate}
-    \item Fingrid: Wind Power Production and Total Consumption Data
-    
-    https://data.fingrid.fi/en
-        
-    \item Entsoe Day-ahead Market price history and current prices
-    
-    https://transparency.entsoe.eu
-    
-    \item Finnish Meteorological Institute Weather Observation Data for Kumpula, Helsinki.
-    
-    https://en.ilmatieteenlaitos.fi/open-data
-    
-\end{enumerate}
+The data used in the project are \href{https://data.fingrid.fi/en}{Fingrid Wind Power Production and Total Consumption Data}, \href{https://transparency.entsoe.eu}{Entsoe Day-ahead Market Price Data}, \href{https://en.ilmatieteenlaitos.fi/open-data}{Finnish Meteorological Institute Weather Observation Data for Kumpula, Helsinki}. The data was accessed in two ways. Large, historical datasets were manually downloaded for exploration, feature extraction and model training and programmatic access was used to enable the web application to get the latest data for user predictions. The programmatic access includes API connections and web scraping.
 
-The data for all sources mentioned above is available publicly in CSV format.
+Even though all the data is available for free, some sources require registering an account to download the full data or access most recent data via API. Characteristics of the data sources are presented in Table \ref{table:data-characteristics}.
+
+\begin{table}[b] 
+\centering 
+\begin{tabular}{l||l c c} 
+Dataset & Format & Access via & Registration\\ 
+\hline \hline
+Entsoe & CSV & UIM, WS  & Required for full access \\
+FMI & CSV & UI, API & Not required \\
+Fingrid & CSV & UIM, API & Required for API access \\
+\hline
+\end{tabular}
+\caption{The data sources used in the project. UIM is abbreviation for manual download via user interface and WS for web scraping.}
+\label{table:data-characteristics}
+\end{table}
+
+
 We chose to downlaod data spanning from the beginning of 2019 as far ahead as possible.
 For predictions, we are additionally fetching the most recent data.
 
@@ -52,7 +59,7 @@ Two separate datasets were created for each data source - historical and a time 
 The historical data is used for training the model, and the forecast combined with available amendments from APIs to construct the final predicted price.
 
 \subsection{Data Warehousing and Data Protection}
-\label{subsection:wareousing}
+\label{subsection:warehousing}
 
 All data used for our purpose is publicly available. No data subject to the GDPR act is used, since we are not collecting any data for individuals.
 
