@@ -19,7 +19,7 @@ This report describes technical aspects of an electricity price prediction softw
 
 The report includes references to \href{https://github.com/IDS-mini/electricity}{the project repository in Github}. In addition to the data exploration, the regression model and the web application source code, the repository also includes our \href{https://github.com/IDS-mini/electricity/blob/main/marketing/Mini-Project-Canvas-Hedlund-Korpi-Ranta.pdf}{project canvas}, \href{https://github.com/IDS-mini/electricity/blob/main/marketing/presentation.pptx}{product pitch presentation} and \href{https://github.com/IDS-mini/electricity/blob/main/src/app/templates/index.html}{web application home page}. As this report does not discuss the added value or the business side of the project, it is advisable to walk through those documents before reading this technical report.
 
-The rest of the report is composed as follows: the data used and data preprocessing is described in Chapter \ref{section:data}. The prediction formulation and the linear regression model used in the project are presented in Chapter \ref{section:analysis}. User experience and results delivery for the end user are reported in Chapter \ref{section:delivery}.
+The rest of the report is composed as follows: the data used and data preprocessing is described in Chapter \ref{section:data}. The prediction formulation and the linear regression model used in the project are reported in Chapter \ref{section:analysis}. User experience and results delivery for the end user are displayed in Chapter \ref{section:delivery}. Observations, discussion and ideas for further development are presented in \ref{section:conclusions}.
 
 \section{Data}
 \label{section:data}
@@ -49,12 +49,21 @@ Fingrid & CSV & UIM, API & Required for API access \\
 
 Entsoe Day-ahead Prices data consists of hourly electricity market prices for Finnish Bidding Zone that covers the whole country. \href{https://data.fingrid.fi/en/data set/wind-power-generation}{The Wind Power Production} data set includes hourly wind power production in Finland in $MWh/h$, \href{https://data.fingrid.fi/en/data set/electricity-consumption-in-finland}{Electricity Consumption} data set $MWh/h$ consumption and from \href{https://en.ilmatieteenlaitos.fi/open-data}{Weather Data} we picked air pressure, rain, humidity, temperature and wind. \href{https://www.helen.fi/en/company/responsibility/current-topics/open-data}{Helen District Heating Power Data} was investigated but was reject, as the data was only available until the end of year 2021.
 
-All the data used in project is provided in one hour interval thus making data integration rather easy. The historical data was downloaded spanning from the beginning of 2019 as far ahead as possible.
+All the data used in project is provided in one hour interval thus making data integration rather easy. The historical data was downloaded spanning from the beginning of 2019 as far ahead as possible. Beginning of 2019 was chosen so that the current volatile prices would not be marginalized in the data set. A visualization of 2022 price volatility can be viewed in Figure \ref{fig:prices-history}.
+
+\begin{figure}[ht] 
+\centering
+\includegraphics[width=\textwidth]{report/images/day-ahead-prices.png}
+\caption{Confirmations on the data processing request form.}
+\label{fig:prices-history} 
+\end{figure}
 
 \subsection{Exploratory Data Analysis and Data Preprocessing}
 \label{subsection:eda}
 
-The purpose of the exploratory data analysis (EDA) and data preprocessing phase was to understand the data and its possible shortages and produce an integrated data set for model training with missing values imputed. This phase was conducted in series of Jupyter Notebook files. The cleaned csv files were written into Apache Parquet format for better data compression and reading performance before integration.
+The purpose of the exploratory data analysis (EDA) and data preprocessing phase was to understand the data and its possible shortages and produce an integrated data set for model training with missing values imputed. This phase was conducted in series of Jupyter Notebook files. The cleaned csv files were written into Apache Parquet format for better data compression and reading performance before integration. The eda and data cleaning notebooks are listed in Table \ref{table:eda}.
+
+As expected, the data cleaning and integration was rather effortless. Missing data rates were low (for example, less than 0.4\% day-ahead prices were missing) and missing values imputation was performed using neighbor values, which intuitively works well with time-series data. In the cleaning process, datetime column was set as data set as index and was thus later used as key to integrate the cleaned parquet files.
 
 \begin{table}[b] 
 \centering 
@@ -67,19 +76,20 @@ Weather & Neighbor values mean & \href{https://github.com/IDS-mini/electricity/b
 Wind power & - & \href{https://github.com/IDS-mini/electricity/blob/main/data/wind_power_eda.ipynb}{wind\_power\_eda.ipynb}\\
 \hline
 \end{tabular}
-\caption{The data sets used to train the model. Link to data sets EDA Jupyter notebook file is presented in the File column.}
+\caption{The data sets used to train the model. Links to data sets' EDA Jupyter notebook files are presented in the File column.}
 \label{table:eda}
 \end{table}
 
-We created Jupyter Notebooks for all data sources to clean and process the data.
-The products of this process was data sets with the datetime field as index.
-Two separate data sets were created for each data source - historical and a time series forecast.
-The historical data is used for training the model, and the forecast combined with available amendments from APIs to construct the final predicted price.
+In addition to the cleaned historical data, time series forecasts for each data sets were created. The former were used to train the model and the latter, supplemented with latest data renewed via programmatic data fetching, to construct final predicted price. The prediction creation process is further discussed in Chapter \ref{section:analysis}. 
+
+The data was integrated in \href{https://github.com/IDS-mini/electricity/blob/main/data/data_integration.ipynb}{data\_integration.ipynb} where new features were also extracted. This process is further detailed in \ref{section:analysis}.
 
 \subsection{Data Warehousing and Data Protection}
 \label{subsection:warehousing}
 
-All data used for our purpose is publicly available. No data subject to the GDPR act is used, since we are not collecting any data for individuals.
+Both the raw, manually downloaded data and the cleaned data were stored in the project repository. As datasets were reasonably-sized, data files being around 0.5 MB, the code repository solution was seen to be adequate. Larger project would have required a scalable warehousing solutions, for example a cloud-based blob storage.
+
+All data used in our project is publicly available and does not include any personal data and none of the data used was subject to the GDPR act. Therefore, the warehousing solution's purpose was to share the data changes and cleanings between project developers and to make sure the data was backed up and version controlled.
 
 \section{Data Analysis}
 \label{section:analysis}
