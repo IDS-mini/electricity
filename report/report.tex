@@ -35,7 +35,7 @@ The data sources used in the project are \href{https://data.fingrid.fi/en}{Fingr
 
 Even though all the data is available for free, some sources require registering an account to download the full data or access most recent data via API. Characteristics of the data sources are presented in Table \ref{table:source-characteristics}.
 
-\begin{table}[b] 
+\begin{table}[ht] 
 \centering 
 \begin{tabular}{l||l c c} 
 data set & Format & Access via & Registration\\ 
@@ -67,7 +67,7 @@ The purpose of the exploratory data analysis (EDA) and data preprocessing phase 
 
 As expected, the data cleaning and integration was rather effortless. Missing data rates were low (for example, less than 0.4\% day-ahead prices were missing) and missing values imputation was performed using neighbor values, which intuitively works well with time-series data. In the cleaning process, datetime column was set as data set as index and was thus later used as key to integrate the cleaned parquet files.
 
-\begin{table}[b] 
+\begin{table}[ht] 
 \centering 
 \begin{tabular}{l||l c} 
 Data set & Imputation method & File\\ 
@@ -107,7 +107,14 @@ The purpose of the project and the data analysis was to create a 36-hour estimat
 
 %% time series features
 
-First, features were extracted from datetime index itself. As electricity usage and thus market price fluctuations are cyclic and depend on time of the year, 
+First, we extracted new features from datetime index itself. As electricity usage and thus market price fluctuations are cyclic and depend on time of the year, the datetime was decomposed to several new features. A rather intuitive example of how these features might affect the rest of the data components is illustrated in Figure \ref{fig:components}.
+
+\begin{figure}[ht] 
+\centering
+\includegraphics[width=\textwidth]{report/images/components.png}
+\caption{A simplified diagram on how we assumed different components could affect each other and thus the target value.}
+\label{fig:components} 
+\end{figure}
 
 %% lag features
 
