@@ -15,7 +15,7 @@
 \section{A Simple Prediction of Electricity Price Development}
 \label{section:introduction}
 
-This report describes technical aspects of an electricity price prediction software made as Introduction to Data Science course mini project. The estimation tool is a Python web application that provides a 36-hour electricity price development prediction based on a model trained with \href{https://xgboost.ai/}{XGBoost library}. The forecast is shown as an hourly three-step recommendation scale and it is based on a linear regression model trained using historical data including electricity price, wind power, power consumption and weather data.
+This report describes technical aspects of an electricity price prediction software made as Introduction to Data Science course mini project. The estimation tool is a Python web application that provides a 72-hour electricity price development prediction based on a model trained with \href{https://xgboost.ai/}{XGBoost library}. The forecast is shown as an hourly three-step recommendation scale and it is based on a linear regression model trained using historical data including electricity price, wind power, power consumption and weather data.
 
 The report includes references to \href{https://github.com/IDS-mini/electricity}{the project repository in Github}. In addition to the data exploration, the regression model and the web application source code, the repository also includes our \href{https://github.com/IDS-mini/electricity/blob/main/marketing/Mini-Project-Canvas-Hedlund-Korpi-Ranta.pdf}{project canvas}, \href{https://github.com/IDS-mini/electricity/blob/main/marketing/presentation.pptx}{product pitch presentation} and \href{https://github.com/IDS-mini/electricity/blob/main/src/app/templates/index.html}{web application home page}. As this report does not discuss the added value or the business side of the project, it is advisable to walk through those documents before reading this technical report.
 
@@ -100,14 +100,14 @@ All data used in our project is publicly available and does not include any pers
 \section{Data Analysis}
 \label{section:analysis}
 
-The purpose of the project and the data analysis was to create a 36-hour estimate on electricity hourly market price development. In order to do so, new features were extracted from the cleansed and integrated data, scripts for refreshing the data were written and supplementary predictions made. The feature extraction is reported in Subchapter \ref{subsection:extraction}, training the XGBoost Regressor is presented in Subchapter \ref{subsection:xgboost} and data refreshing and intermediate forecasts to support contemporary predictions are discussed in Subchapter \ref{subsection:datafilling} .
+The purpose of the project and the data analysis was to create a 72-hour estimate on electricity hourly market price development. In order to do so, we extracted new features from the cleansed and integrated data, wrote scripts for refreshing the data and supplementary predictions. The feature extraction is reported in Subchapter \ref{subsection:extraction}, training the XGBoost Regressor is presented in Subchapter \ref{subsection:xgboost} and data refreshing and intermediate forecasts to support contemporary predictions are discussed in Subchapter \ref{subsection:datafilling} .
 
 \subsection{Feature Extraction}
 \label{subsection:extraction}
 
 %% time series features
 
-First, we extracted new features from datetime index itself. As electricity usage and thus market price fluctuations are cyclic and depend on time of the year, the datetime was decomposed to several new features. A rather intuitive example of how these features might affect the rest of the data components is illustrated in Figure \ref{fig:components}.
+First, we extracted new features from datetime index itself. As electricity usage and thus market price fluctuations are cyclic and depend on time of the year, weekday, time of the day and so on, the datetime was decomposed to several new features. A rather intuitive example of how we thought these features might affect the rest of the data components is illustrated in Figure \ref{fig:components}.
 
 \begin{figure}[ht] 
 \centering
@@ -116,37 +116,27 @@ First, we extracted new features from datetime index itself. As electricity usag
 \label{fig:components} 
 \end{figure}
 
-%% lag features
-
+Second, lag features were extracted from the data. The data was supplemented with component values from one, two and three years ago. %% why these
 
 \subsection{Time Series Prediction with XGBoost}
 \label{subsection:xgboost}
 
-%% data set to train the model, table
+After feature extraction, the features chosen to eventually train the model were \textbf{Consumption, Wind, Air Pressure, Rain, Humidity, Temperature} and \textbf{Wind} with their three corresponding lag features combined with \textbf{Day of Year, Hour, Day of Week, Quarter, Month} and \textbf{Price lag features} without the Price itself as it was set as target value.
 
-Features extracted for the model were:
+The machine learning model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. We found it to be very fast to train and very accurate. In addition we had some experience on XGBoost from previous projects. 
 
-'WindMWh', 'ConsumptionMWh', 'pressure', 'rain', 'humidity',
+When training the models, we used cross-validation with time series splits so that we could validate the model with real past data. An illustration of cross-validation can be seen in Appendix A, Figure \ref{fig:ts-cross-validation}.
 
-'temperature', 'wind' and the target value was 'price'.
 
-The ML model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. It was found to be very fast to train and very accurate.
-
-When training the models, we used cross validation with time series splits (See figure \ref{fig:ts-cross-validation}). 
-
-The forecast is done twice a day with Github actions and saved to the repository. The webapp shows the latest forecast.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=15cm]{report/images/ts-cross-validation.png}
-    \caption{Cross validation using Time Series Splits with each split being a year.}
-    \label{fig:ts-cross-validation}
-\end{figure}
 
 \subsection{Gathering the Data for the Prediction}
 \label{subsection:datafilling}
 
-Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts as a base that should give a best estimate of the values (See figure \ref{fig:consumption}). Then if newer data was available, this forecasted base was updated through programmatic data fetching.
+As the model is trained on past data, all the same variables need to be present when performing the contemporary prediction. Not all of these are available for each prediction time. For example, for obvious reasons, we do not have historical data for humidity 24 hours in the future.
+
+To circumvent the problem, we created time series forecasts as a base that should give a best estimate of the values. An example of Consumption forecast is presented in Figure \ref{fig:consumption}. Also, Finnish Meteorological Institute's two-day forecast is exploited when filling the future data. This forecasted base is then updated with programmatic data fetching as data is available from data sources.
+
+The forecast is done automatically twice a day with Github actions and saved to the repository. The web application then uses this prepared data when showing the recommendations for the end user. Deriving the recommendation from the forecasted price is discussed in more detail in Chapter \ref{section:delivery}. 
 
 \begin{figure}
     \centering
@@ -156,11 +146,18 @@ Since the model is trained on past data, all the same variables need to be prese
 \end{figure}
 
 
-
-
-
 \section{Delivering Results for the End User}
 \label{section:delivery}
+
+For the contemporary results delivery to the end user, we built a simple Python web application. To make the prediction more comprehensible for the end user, a three-level recommendation is inferred from the predicted price. The web application with invoking instructions is briefly presented in Subchapter \ref{subsection:server} and the recommendation for the end user is described in Subchapter \ref{subsection:ux}.
+
+\subsection{Web Application}
+\label{subsection:server}
+
+Our deliverable is a web application built with FastAPI that serves a landing page and a page for planning. The plan page shows a table with hourly times for the next 72 hours with a recommendation and the price index. The whole package is available on Github at https://github.com/IDS-mini/electricity .
+
+\subsection{Electricity Usage Recommendation and User Experience}
+\label{subsection:ux}
 
 We calculate a simple moving average (SMA) of the electricity price with a window of 168 hours (7 days) to create a reference price point. For each prediction time, we compare the predicted or known price to the index via equation \ref{eq:index}.
 
@@ -177,16 +174,6 @@ The price index is then classified as follows:
     \item $\text{"Price Index"}_i > 1.2$ : "Restrict"
 \end{enumerate}
 
-\subsection{Web Application}
-\label{subsection:server}
-
-Our deliverable is a web application built with FastAPI that serves a landing page and a page for planning. The plan page shows a table with hourly times for the next 36 hours with a recommendation and the price index. The whole package is available on Github at https://github.com/IDS-mini/electricity .
-
-\subsection{Visualization and User Experience}
-\label{subsection:ux}
-
-%% no gdpr data gathered from the user either
-
 \section{Conclusions}
 \label{section:conclusions}
 
@@ -194,6 +181,19 @@ Our deliverable is a web application built with FastAPI that serves a landing pa
 %% what was learned
 %% what we would do differently
 %% ideas for further development or research
+
+\section{Appendix A: Data Illustrations}
+\label{section:appendixa}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=15cm]{report/images/ts-cross-validation.png}
+    \caption{Cross validation using Time Series Splits with each split being a year.}
+    \label{fig:ts-cross-validation}
+\end{figure}
+
+\section{Appendix B: Application User Interface Screenshots}
+\label{section:}
 
 
 \end{document}
