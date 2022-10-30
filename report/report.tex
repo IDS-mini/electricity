@@ -93,7 +93,7 @@ In addition to the cleaned historical data, time series forecasts for each data 
 \subsection{Data Warehousing and Data Protection}
 \label{subsection:warehousing}
 
-Both the raw, manually downloaded data and the cleaned data were stored in the project repository. As datasets were reasonably-sized, data files being around 0.5 MB, the code repository solution was seen to be adequate. Larger project would have required a more scalable warehousing solution, for example a cloud-based blob storage.
+Both the raw, manually downloaded data and the cleaned data were stored in the project repository. As datasets were reasonably-sized, data files being around 0.5 MB, we evaluated the code repository solution to be adequate. Larger project would have required a more scalable warehousing solution, for example a cloud-based blob storage.
 
 All data used in our project is publicly available and does not include any personal data, so no data used in the project was subject to the GDPR act. Therefore, the warehousing solution's sole purpose was to share the data changes and cleanings between project developers and to keep the data backed up and version controlled.
 
@@ -121,7 +121,7 @@ Second, lag features were extracted from the data. The data was supplemented wit
 \subsection{Time Series Prediction with XGBoost}
 \label{subsection:xgboost}
 
-After feature extraction, the features chosen to eventually train the model were \textbf{Consumption, Wind, Air Pressure, Rain, Humidity, Temperature} and \textbf{Wind} with their three corresponding lag features combined with \textbf{Day of Year, Hour, Day of Week, Quarter, Month} and \textbf{Price lag features} without the Price itself as it was set as target value.
+After feature extraction, the features chosen to eventually train the model were \textbf{Consumption, Wind, Air Pressure, Rain, Humidity, Temperature} and \textbf{Wind} with their three corresponding lag features. In addition, \textbf{Day of Year, Hour, Day of Week, Quarter, Month} and \textbf{Price lag features} were added to the features. The Price itself as it was set as target value.
 
 The machine learning model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. We found it to be very fast to train and very accurate. In addition we had some experience on XGBoost from previous projects. 
 
@@ -154,14 +154,16 @@ For the contemporary results delivery to the end user, we built a simple Python 
 \subsection{Web Application}
 \label{subsection:server}
 
-Our deliverable is a web application built with FastAPI that serves a landing page and a page for planning. The plan page shows a table with hourly times for the next 72 hours with a recommendation and the price index. The whole package is available on Github at https://github.com/IDS-mini/electricity.
+Our deliverable is a web application built with FastAPI. The application serves a landing page and a page for planning. The landing page includes some instructions and reasons for electricity usage optimization and plan page shows a table with hourly times for the next 72 hours with a recommendation and the price index. The whole package is available on Github at https://github.com/IDS-mini/electricity.
 
-To run the app, one needs API key for the \href{https://data.fingrid.fi/open-data-forms/registration/}{Fingrid API} which is set to an environment variable used by \href{https://github.com/IDS-mini/electricity/blob/main/src/app/utils/fetch_consumption.py}{fetch\_consumption.py}. The project author's API key is not stored in the public repository. For project evaluation purposes the API key can be acquired from the project authors from their university email address. Since the web application is fairly simple, comprehensive screenshots are provided in Appendix \ref{section:appendixb}.
+To run the app, one needs API key for the \href{https://data.fingrid.fi/open-data-forms/registration/}{Fingrid API} which is set into an environment variable used by \href{https://github.com/IDS-mini/electricity/blob/main/src/app/utils/fetch_consumption.py}{fetch\_consumption.py}. The project authors' API key is not stored in the public repository. For project evaluation purposes the API key can be acquired from the project authors via their university email addresses. Since the web application is fairly simple, comprehensive user interface screenshots are provided in Appendix \ref{section:appendixb} and current predictions may be viewed in the \href{https://github.com/IDS-mini/electricity/blob/main/forecast_data/forecasts.csv}{project repository}.
 
 \subsection{Electricity Usage Recommendation and User Experience}
 \label{subsection:ux}
 
-We calculate a simple moving average (SMA) of the electricity price with a window of 168 hours (7 days) to create a reference price point. For each prediction time, we compare the predicted or known price to the index via equation \ref{eq:index}.
+As the market price is currently extremely volatile, we wanted to avoid obvious prediction pitfalls. A precise, hourly $EUR/kWh$ prediction could be easily perceived faulty if it would not hit the target accurately. Furthermore, it would not convey the right message as we wanted to assist the end user to find the cheapest and most expensive periods of time in the near future rather than predict the sum of their next electricity bill.
+
+Therefore, instead of a monetary value per hour, we created a three-step scale to steer the end user: \textbf{boost}, \textbf{maintain} or \textbf{restrict} electricity usage. To achieve this, we calculate a simple moving average (SMA) of the electricity price with a window of last 168 hours (7 days) to create a reference price point. For each prediction time, we compare the predicted or known price to the index. The calculation is illustrated in Equation \ref{eq:index}.
 
 
 \begin{equation} \label{eq:index}
@@ -176,8 +178,12 @@ The price index is then classified as follows:
     \item $\text{"Price Index"}_i > 1.2$ : "Restrict"
 \end{enumerate}
 
-\section{Conclusions}
+The steps are then color coded to green, yellow and red so that user can easily spot the coming peaks. As the prediction is fully based on public data, the web application does not collect data from the end user.
+
+\section{Discussion and Conclusions}
 \label{section:conclusions}
+
+In this report we have presented how data was gathered and preprocessed, how machine learning model was trained, how supplementary predictions were made and how a comprehensible prediction for the end user was derived to assist the end user to optimize their electricity usage. 
 
 %% what was achieved
 %% what was learned
