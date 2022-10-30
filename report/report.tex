@@ -134,9 +134,9 @@ When training the models, we used cross-validation with time series splits so th
 
 As the model is trained on past data, all the same variables need to be present when performing the contemporary prediction. Not all of these are available for each prediction time. For example, for obvious reasons, we do not have historical data for humidity 24 hours in the future.
 
-To circumvent the problem, we created time series forecasts as a base that should give a best estimate of the values. An example of Consumption forecast is presented in Figure \ref{fig:consumption}. Also, Finnish Meteorological Institute's two-day forecast is exploited when filling the future data. This forecasted base is then updated with programmatic data fetching as data is available from data sources.
+To circumvent the problem, we created time series forecasts as a base that should give a best estimate of the values. An example of Consumption forecast is presented in Figure \ref{fig:consumption} in Appendix \ref{section:appendixa}. Also, Finnish Meteorological Institute's two-day forecast is exploited when filling the future data. This forecasted base is then updated with programmatic data fetching as data is available from data sources.
 
-The forecast is done automatically twice a day with Github actions and saved to the repository. The web application then uses this prepared data when showing the recommendations for the end user. Deriving the recommendation from the forecasted price is discussed in more detail in Chapter \ref{section:delivery}. 
+The forecast is part of the web application's code. In addition, the prediction is automatically run twice a day with Github actions and saved to the repository. The web application then tries to use this prepared data when showing the recommendations for the end user. Deriving the recommendation from the forecasted price is discussed in more detail in Chapter \ref{section:delivery}. 
 
 \begin{figure}
     \centering
@@ -154,7 +154,9 @@ For the contemporary results delivery to the end user, we built a simple Python 
 \subsection{Web Application}
 \label{subsection:server}
 
-Our deliverable is a web application built with FastAPI that serves a landing page and a page for planning. The plan page shows a table with hourly times for the next 72 hours with a recommendation and the price index. The whole package is available on Github at https://github.com/IDS-mini/electricity .
+Our deliverable is a web application built with FastAPI that serves a landing page and a page for planning. The plan page shows a table with hourly times for the next 72 hours with a recommendation and the price index. The whole package is available on Github at https://github.com/IDS-mini/electricity.
+
+To run the app, one needs API key for the \href{https://data.fingrid.fi/open-data-forms/registration/}{Fingrid API} which is set to an environment variable used by \href{https://github.com/IDS-mini/electricity/blob/main/src/app/utils/fetch_consumption.py}{fetch\_consumption.py}. The project author's API key is not stored in the public repository. For project evaluation purposes the API key can be acquired from the project authors from their university email address. Since the web application is fairly simple, comprehensive screenshots are provided in Appendix \ref{section:appendixb}.
 
 \subsection{Electricity Usage Recommendation and User Experience}
 \label{subsection:ux}
@@ -182,18 +184,15 @@ The price index is then classified as follows:
 %% what we would do differently
 %% ideas for further development or research
 
-\section{Appendix A: Data Illustrations}
+
+\appendix
+\section{Data Illustrations}
+\input{report/appendices/graphs}
 \label{section:appendixa}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=15cm]{report/images/ts-cross-validation.png}
-    \caption{Cross validation using Time Series Splits with each split being a year.}
-    \label{fig:ts-cross-validation}
-\end{figure}
-
-\section{Appendix B: Application User Interface Screenshots}
-\label{section:}
+\section{Application User Interface Screenshots}
+\input{report/appendices/ui}
+\label{section:appendixb}
 
 
 \end{document}
