@@ -15,7 +15,7 @@
 \section{A Simple Prediction of Electricity Price Development}
 \label{section:introduction}
 
-This report describes technical aspects of an electricity price prediction software made as Introduction to Data Science course mini project. The estimation tool is a Python web application that provides a 36-hour electricity price development prediction. The forecast is shown as an hourly three-step recommendation scale and it is based on a linear regression model trained with historical data including electricity price, power consumption and weather data.
+This report describes technical aspects of an electricity price prediction software made as Introduction to Data Science course mini project. The estimation tool is a Python web application that provides a 36-hour electricity price development prediction. The forecast is shown as an hourly three-step recommendation scale and it is based on a linear regression model trained with historical data including electricity price, wind power, power consumption and weather data.
 
 The report includes references to \href{https://github.com/IDS-mini/electricity}{the project repository in Github}. In addition to the data exploration, the regression model and the web application source code, the repository also includes our \href{https://github.com/IDS-mini/electricity/blob/main/marketing/Mini-Project-Canvas-Hedlund-Korpi-Ranta.pdf}{project canvas}, \href{https://github.com/IDS-mini/electricity/blob/main/marketing/presentation.pptx}{product pitch presentation} and \href{https://github.com/IDS-mini/electricity/blob/main/src/app/templates/index.html}{web application home page}. As this report does not discuss the added value or the business side of the project, it is advisable to walk through those documents before reading this technical report.
 
@@ -108,7 +108,7 @@ Features extracted for the model were:
 \subsection{Gathering the Data for the Prediction}
 \label{subsection:datafilling}
 
-Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts that should give a best estimate of the values (See figure \ref{fig:consumption}).
+Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts as a base that should give a best estimate of the values (See figure \ref{fig:consumption}). Then if newer data was available, this forecasted base was updated through programmatic data fetching.
 
 \begin{figure}
     \centering
@@ -122,7 +122,9 @@ Since the model is trained on past data, all the same variables need to be prese
 
 The ML model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. It was found to be very fast to train and very accurate.
 
-When training the forecasts, we used cross validation with time series splits (See figure \ref{fig:ts-cross-validation}).
+When training the models, we used cross validation with time series splits (See figure \ref{fig:ts-cross-validation}). 
+
+The forecast is done twice a day with Github actions and saved to the repository. The webapp shows the latest forecast.
 
 \begin{figure}
     \centering
