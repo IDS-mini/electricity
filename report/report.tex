@@ -15,19 +15,21 @@
 \section{A Simple Prediction of Electricity Price Development}
 \label{section:introduction}
 
-This report describes technical aspects of an electricity price prediction software made as Introduction to Data Science course mini project. The estimation tool is a Python web application that provides a 36-hour electricity price development prediction. The forecast is shown as an hourly three-step recommendation scale and it is based on a linear regression model trained with historical data including electricity price, wind power, power consumption and weather data.
+This report describes technical aspects of an electricity price prediction software made as Introduction to Data Science course mini project. The estimation tool is a Python web application that provides a 36-hour electricity price development prediction based on a model trained with \href{https://xgboost.ai/}{XGBoost library}. The forecast is shown as an hourly three-step recommendation scale and it is based on a linear regression model trained using historical data including electricity price, wind power, power consumption and weather data.
 
 The report includes references to \href{https://github.com/IDS-mini/electricity}{the project repository in Github}. In addition to the data exploration, the regression model and the web application source code, the repository also includes our \href{https://github.com/IDS-mini/electricity/blob/main/marketing/Mini-Project-Canvas-Hedlund-Korpi-Ranta.pdf}{project canvas}, \href{https://github.com/IDS-mini/electricity/blob/main/marketing/presentation.pptx}{product pitch presentation} and \href{https://github.com/IDS-mini/electricity/blob/main/src/app/templates/index.html}{web application home page}. As this report does not discuss the added value or the business side of the project, it is advisable to walk through those documents before reading this technical report.
 
-The rest of the report is composed as follows: the data used and data preprocessing is described in Chapter \ref{section:data}. The prediction formulation and the linear regression model used in the project are reported in Chapter \ref{section:analysis}. User experience and results delivery for the end user are displayed in Chapter \ref{section:delivery}. Observations, discussion and ideas for further development are presented in \ref{section:conclusions}.
+The rest of the report is composed as follows: the data used and data preprocessing are described in Chapter \ref{section:data}. The prediction formulation and the linear regression model used in the project are reported in Chapter \ref{section:analysis}. User experience and results delivery for the end user are displayed in Chapter \ref{section:delivery}. Observations, discussion and ideas for further development are presented in \ref{section:conclusions}.
 
 \section{Data}
 \label{section:data}
 
-In order to produce the prediction, several sets of historical data were used. The data sets are described in Subchapter \ref{subsection:datadescription} and comments on the data exploration and preprocessing in Subchapter \ref{subsection:eda}. Data storaging and protection are reported in Subchapter \ref{subsection:warehousing}.
+In order to produce the prediction, several sets of historical data were used. The data sets are described in Subchapter \ref{subsection:datadescription} and comments on the data exploration and preprocessing in Subchapter \ref{subsection:eda}. Data storage and protection are reported in Subchapter \ref{subsection:warehousing}.
 
 \subsection{Data Used in the Project}
 \label{subsection:datadescription}
+
+%% why this data, ref to feature extraction
 
 The data sources used in the project are \href{https://data.fingrid.fi/en}{Fingrid Wind Power Production and Total Consumption Data}, \href{https://transparency.entsoe.eu}{Entsoe Day-ahead Market Price Data}, \href{https://en.ilmatieteenlaitos.fi/open-data}{Finnish Meteorological Institute Weather Observation Data for Kumpula, Helsinki}. The data was accessed in two ways. Large, historical data sets were manually downloaded for exploration, feature extraction and model training and programmatic access was used to enable the web application to get the latest data for user predictions. The programmatic access includes API connections and web scraping.
 
@@ -54,7 +56,7 @@ All the data used in project is provided in one hour interval thus making data i
 \begin{figure}[ht] 
 \centering
 \includegraphics[width=\textwidth]{report/images/day-ahead-prices.png}
-\caption{Confirmations on the data processing request form.}
+\caption{Day-ahead market prices for electricity in Finland.}
 \label{fig:prices-history} 
 \end{figure}
 
@@ -80,45 +82,46 @@ Wind power & - & \href{https://github.com/IDS-mini/electricity/blob/main/data/wi
 \label{table:eda}
 \end{table}
 
-In addition to the cleaned historical data, time series forecasts for each data sets were created. The former were used to train the model and the latter, supplemented with latest data renewed via programmatic data fetching, to construct final predicted price. The prediction creation process is further discussed in Chapter \ref{section:analysis}. 
+In addition to the cleaned historical data, time series forecasts for each data sets were created. The former were used to train the model and the latter, supplemented with latest data renewed via programmatic data fetching, to construct final predicted price. The data was integrated in \href{https://github.com/IDS-mini/electricity/blob/main/data/data_integration.ipynb}{data\_integration.ipynb} where new features were also extracted. Both feature extraction and prediction creation process are further discussed in Chapter \ref{section:analysis}.
 
-The data was integrated in \href{https://github.com/IDS-mini/electricity/blob/main/data/data_integration.ipynb}{data\_integration.ipynb} where new features were also extracted. This process is further detailed in \ref{section:analysis}.
+%% eda findings
+
+    %% week and day cycle of electricity price
+    %% cold weather effecting consumption
+    %% connection between consumption and price
 
 \subsection{Data Warehousing and Data Protection}
 \label{subsection:warehousing}
 
-Both the raw, manually downloaded data and the cleaned data were stored in the project repository. As datasets were reasonably-sized, data files being around 0.5 MB, the code repository solution was seen to be adequate. Larger project would have required a scalable warehousing solutions, for example a cloud-based blob storage.
+Both the raw, manually downloaded data and the cleaned data were stored in the project repository. As datasets were reasonably-sized, data files being around 0.5 MB, the code repository solution was seen to be adequate. Larger project would have required a more scalable warehousing solution, for example a cloud-based blob storage.
 
-All data used in our project is publicly available and does not include any personal data and none of the data used was subject to the GDPR act. Therefore, the warehousing solution's purpose was to share the data changes and cleanings between project developers and to make sure the data was backed up and version controlled.
+All data used in our project is publicly available and does not include any personal data, so no data used in the project was subject to the GDPR act. Therefore, the warehousing solution's sole purpose was to share the data changes and cleanings between project developers and to keep the data backed up and version controlled.
 
 \section{Data Analysis}
 \label{section:analysis}
 
-%% target value
+The purpose of the project and the data analysis was to create a 36-hour estimate on electricity hourly market price development. In order to do so, new features were extracted from the cleansed and integrated data, scripts for refreshing the data were written and supplementary predictions made. The feature extraction is reported in Subchapter \ref{subsection:extraction}, training the XGBoost Regressor is presented in Subchapter \ref{subsection:xgboost} and data refreshing and intermediate forecasts to support contemporary predictions are discussed in Subchapter \ref{subsection:datafilling} .
+
 \subsection{Feature Extraction}
 \label{subsection:extraction}
+
+%% time series features
+
+First, features were extracted from datetime index itself. As electricity usage and thus market price fluctuations are cyclic and depend on time of the year, 
+
+%% lag features
+
+
+\subsection{Time Series Prediction with XGBoost}
+\label{subsection:xgboost}
+
+%% data set to train the model, table
 
 Features extracted for the model were:
 
 'WindMWh', 'ConsumptionMWh', 'pressure', 'rain', 'humidity',
 
 'temperature', 'wind' and the target value was 'price'.
-
-
-\subsection{Gathering the Data for the Prediction}
-\label{subsection:datafilling}
-
-Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts as a base that should give a best estimate of the values (See figure \ref{fig:consumption}). Then if newer data was available, this forecasted base was updated through programmatic data fetching.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=15cm]{report/images/consumption.png}
-    \caption{Time series for Consumption in MWh with historical data in red and the forecast in orange.}
-    \label{fig:consumption}
-\end{figure}
-
-\subsection{Time Series Prediction with XGBoost}
-\label{subsection:xgboost}
 
 The ML model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. It was found to be very fast to train and very accurate.
 
@@ -132,6 +135,20 @@ The forecast is done twice a day with Github actions and saved to the repository
     \caption{Cross validation using Time Series Splits with each split being a year.}
     \label{fig:ts-cross-validation}
 \end{figure}
+
+\subsection{Gathering the Data for the Prediction}
+\label{subsection:datafilling}
+
+Since the model is trained on past data, all the same variables need to be present when performing the prediction. Since all of these are not available for the prediction time, we created time series forecasts as a base that should give a best estimate of the values (See figure \ref{fig:consumption}). Then if newer data was available, this forecasted base was updated through programmatic data fetching.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=15cm]{report/images/consumption.png}
+    \caption{Time series for Consumption in MWh with historical data in red and the forecast in orange.}
+    \label{fig:consumption}
+\end{figure}
+
+
 
 
 
