@@ -30,7 +30,7 @@ This report describes technical aspects of an electricity price prediction softw
 
 The report includes references to \href{https://github.com/IDS-mini/electricity}{the project repository in Github}. In addition to the data exploration, the regression model and the web application source code, the repository also includes our \href{https://github.com/IDS-mini/electricity/blob/main/marketing/Mini-Project-Canvas-Hedlund-Korpi-Ranta.pdf}{project canvas}, \href{https://github.com/IDS-mini/electricity/blob/main/marketing/presentation.pptx}{product pitch presentation} and \href{https://github.com/IDS-mini/electricity/blob/main/src/app/templates/index.html}{web application home page}, the latter including motivation for the user to optimize their electricity consumption. As this report does not discuss the added value or the business side of the project, it is advisable to walk through those documents before reading this technical report.
 
-The rest of the report is composed as follows: the data used and data preprocessing are described in Chapter \ref{section:data}. The prediction formulation and the regression model used in the project are reported in Chapter \ref{section:analysis}. The user experience and the eventual results delivery for the end user are displayed in Chapter \ref{section:delivery}. Observations, discussion and ideas for further development are presented in \ref{section:conclusions}.
+The rest of the report is composed as follows: the data used and data preprocessing are described in Chapter \ref{section:data}. The prediction formulation and the regression model used in the project are reported in Chapter \ref{section:analysis}. The user experience and the eventual results delivery for the end user are displayed in Chapter \ref{section:delivery}. Observations, discussion and ideas for further development are presented in Chapter \ref{section:conclusions}.
 
 \section{Data}
 \label{section:data}
@@ -102,7 +102,7 @@ The most important EDA findings were the expected cyclicity of consumption and t
 
 Both the raw, manually downloaded data and the cleaned data were stored in the project repository. As datasets were reasonably-sized, data files being around 0.5 MB, we evaluated the code repository solution to be adequate. Larger project would have required a more scalable warehousing solution, for example a cloud-based blob storage.
 
-All data used in our project is publicly available and does not include any personal data, so no data used in the project was subject to the GDPR act. Therefore, the warehousing solution's sole purpose was to share the data changes and cleanings between project developers and to keep the data backed up and version controlled.
+All data used in our project is publicly available and does not include any personal data, so no data used in the project is subject to the GDPR act. Therefore, the warehousing solution's sole purpose was to share the data changes and cleanings between project developers and to keep the data backed up and version controlled.
 
 \section{Data Analysis}
 \label{section:analysis}
@@ -159,14 +159,14 @@ For the contemporary results delivery to the end user, we built a simple Python 
 
 Our deliverable is a web application built with FastAPI. The application serves a landing page and a page for planning. The landing page includes some instructions and reasons for electricity usage optimization and plan page shows a table with hourly times for the next 72 hours with a recommendation and the price index. The whole package is available on Github at https://github.com/IDS-mini/electricity.
 
-To run the app, one needs API key for the \href{https://data.fingrid.fi/open-data-forms/registration/}{Fingrid API} which is set into an environment variable used by \href{https://github.com/IDS-mini/electricity/blob/main/src/app/utils/fetch_consumption.py}{fetch\_consumption.py}. The project authors' API key is not stored in the public repository. For project evaluation purposes the API key can be acquired from the project authors via their university email addresses. Since the web application is fairly simple, comprehensive user interface screenshots are provided in Appendix \ref{section:appendixb} and current predictions may be viewed in the \href{https://github.com/IDS-mini/electricity/blob/main/forecast_data/forecasts.csv}{project repository}.
+To run the app, one needs an API key for the \href{https://data.fingrid.fi/open-data-forms/registration/}{Fingrid API} which is set into an environment variable used by \href{https://github.com/IDS-mini/electricity/blob/main/src/app/utils/fetch_consumption.py}{fetch\_consumption.py}. The project authors' API key is not stored in the public repository. For project evaluation purposes the API key can be acquired from the project authors via their university email addresses. Since the web application is fairly simple, comprehensive user interface screenshots are provided in Appendix \ref{section:appendixb} and current predictions may be viewed in the \href{https://github.com/IDS-mini/electricity/blob/main/forecast_data/forecasts.csv}{project repository}.
 
 \subsection{Electricity Usage Recommendation and User Experience}
 \label{subsection:ux}
 
 As the market price is currently extremely volatile, we wanted to avoid obvious prediction pitfalls. A precise, hourly $EUR/kWh$ prediction could be easily perceived faulty if it would not hit the target accurately. Furthermore, it would not convey the right message as we wanted to assist the end user to find the cheapest and most expensive periods of time in the near future rather than predict the sum of their next electricity bill.
 
-Therefore, instead of a monetary value per hour, we created a three-step scale to steer the end user: \textbf{boost}, \textbf{maintain} or \textbf{restrict} electricity usage. To achieve this, we calculate a simple moving average (SMA) of the electricity price with a window of last 168 hours (7 days) to create a reference price point. For each prediction time, we compare the predicted or known price to the index. The calculation is illustrated in Equation \ref{eq:index}.
+Therefore, instead of a monetary value per hour, we created a three-step scale to steer the end user: \textbf{boost}, \textbf{maintain} or \textbf{restrict} electricity usage. To achieve this, a simple moving average (SMA) of the electricity price is calculated with a window of last 168 hours (7 days) to create a reference price point. For each prediction time, the predicted or known price is compared to the index. The calculation is illustrated in Equation \ref{eq:index}.
 
 
 \begin{equation} \label{eq:index}
@@ -188,26 +188,27 @@ The steps are then color coded to green, yellow and red so that user can easily 
 
 In this report we have presented how data was gathered and preprocessed, how machine learning model was trained, how supplementary predictions were made and how a comprehensible prediction for the end user was derived to assist the end user to optimize their electricity usage. We strived to create a model that could learn the interaction between different variables that could influence the relative price of electricity, and use it to build a sensible forecast that has a prediction horizon of 72 hours.
 
-At first, we were contemplative about the ability of the weather data, which was from Kumpula, Helsinki, to represent the whole area, as wind power production in Finland is spread around the country. The Wind\_MWh, however, together with Consumption\_MWh played a major role in the training of the model. The feature importances can be seen in Appendix \ref{section:appendixa}, Figure \ref{fig:feature-importances}. 
+At first, we were contemplative about the ability of the weather data, which was from Kumpula, Helsinki, to represent the whole area, as wind power production in Finland is spread around the country. The Wind\_MWh, however, together with Consumption\_MWh played a major role in the training of the model. The feature importances can be seen in Appendix \ref{section:appendixa}, Figure \ref{fig:feature-importances}.
+
+As discussed earlier, we used weather forecasts and our own supplementary predictions to predict electricity price. In addition, at the each prediction time, the day-ahead price is available 24 hours to the future. This caused us some pondering, as we noticed that our model gave lower predictions than the day-ahead electricity price. 
+
+Therefore, if we would replace the first 24 hours of our own prediction with the day-ahead price, it would affect the price index calculation thus making the rest of the 72-hour period appear relatively cheap. Hence, the forecast method of \href{https://github.com/IDS-mini/electricity/blob/main/src/app/predictor.py}{predictor.py} can be directed with a parameter to use or not to use the day-ahead price to replace the first 24 hours of prediction. The screenshot in Appendix \ref{section:appendixb}, Figure \ref{fig:app-planning-page} shows recommendation level bias when the predictor has used the day-ahead available.
 
 A deeper analysis of the effects of the variables would be needed to further tune the accuracy of the model. If the model was developed further, for example more geographical weather data points and wind power plant locations could be examined. Within the existing data, more lag features could be investigated.
 
 If the application would actually be in production use, the the MLOps principles, e.g. model monitoring, to be implemented. The model should be periodically monitored for decay and retrained when necessary.
 
-%% what was achieved
-%% what was learned
-%% what we would do differently
-%% ideas for further development or research
-
 
 \appendix
 \section{Data Illustrations}
-\input{report/appendices/graphs}
 \label{section:appendixa}
+\input{report/appendices/graphs}
+
 
 \section{Application User Interface Screenshots}
-\input{report/appendices/ui}
 \label{section:appendixb}
+\input{report/appendices/ui}
+
 
 
 \end{document}
