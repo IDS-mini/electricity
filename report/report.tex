@@ -3,6 +3,16 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[x11names]{xcolor}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,      
+    urlcolor=SkyBlue4,
+    pdftitle={Electricity Usage Optimizer},
+    pdfpagemode=FullScreen,
+    }
 
 \begin{document}
 
@@ -15,11 +25,11 @@
 \section{A Simple Prediction of Electricity Price Development}
 \label{section:introduction}
 
-This report describes technical aspects of an electricity price prediction software made as Introduction to Data Science course mini project. The estimation tool is a Python web application that provides a 72-hour electricity price development prediction based on a model trained with \href{https://xgboost.ai/}{XGBoost library}. The forecast is shown as an hourly three-step recommendation scale and it is based on a linear regression model trained using historical data including electricity price, wind power, power consumption and weather data.
+This report describes technical aspects of an electricity price prediction software made as Introduction to Data Science course mini project. The estimation tool is a Python web application that provides a 72-hour electricity price development prediction. The forecast is shown as an hourly three-step recommendation scale and it is based on \href{https://xgboost.ai/}{XGBoost library} regression model trained using historical data including electricity price, wind power, power consumption and weather data.
 
-The report includes references to \href{https://github.com/IDS-mini/electricity}{the project repository in Github}. In addition to the data exploration, the regression model and the web application source code, the repository also includes our \href{https://github.com/IDS-mini/electricity/blob/main/marketing/Mini-Project-Canvas-Hedlund-Korpi-Ranta.pdf}{project canvas}, \href{https://github.com/IDS-mini/electricity/blob/main/marketing/presentation.pptx}{product pitch presentation} and \href{https://github.com/IDS-mini/electricity/blob/main/src/app/templates/index.html}{web application home page}. As this report does not discuss the added value or the business side of the project, it is advisable to walk through those documents before reading this technical report.
+The report includes references to \href{https://github.com/IDS-mini/electricity}{the project repository in Github}. In addition to the data exploration, the regression model and the web application source code, the repository also includes our \href{https://github.com/IDS-mini/electricity/blob/main/marketing/Mini-Project-Canvas-Hedlund-Korpi-Ranta.pdf}{project canvas}, \href{https://github.com/IDS-mini/electricity/blob/main/marketing/presentation.pptx}{product pitch presentation} and \href{https://github.com/IDS-mini/electricity/blob/main/src/app/templates/index.html}{web application home page}, the latter including motivation for the user to optimize their electricity consumption. As this report does not discuss the added value or the business side of the project, it is advisable to walk through those documents before reading this technical report.
 
-The rest of the report is composed as follows: the data used and data preprocessing are described in Chapter \ref{section:data}. The prediction formulation and the linear regression model used in the project are reported in Chapter \ref{section:analysis}. User experience and results delivery for the end user are displayed in Chapter \ref{section:delivery}. Observations, discussion and ideas for further development are presented in \ref{section:conclusions}.
+The rest of the report is composed as follows: the data used and data preprocessing are described in Chapter \ref{section:data}. The prediction formulation and the regression model used in the project are reported in Chapter \ref{section:analysis}. The user experience and the eventual results delivery for the end user are displayed in Chapter \ref{section:delivery}. Observations, discussion and ideas for further development are presented in \ref{section:conclusions}.
 
 \section{Data}
 \label{section:data}
@@ -84,11 +94,7 @@ Wind power & - & \href{https://github.com/IDS-mini/electricity/blob/main/data/wi
 
 In addition to the cleaned historical data, time series forecasts for each data sets were created. The former were used to train the model and the latter, supplemented with latest data renewed via programmatic data fetching, to construct final predicted price. The data was integrated in \href{https://github.com/IDS-mini/electricity/blob/main/data/data_integration.ipynb}{data\_integration.ipynb} where new features were also extracted. Both feature extraction and prediction creation process are further discussed in Chapter \ref{section:analysis}.
 
-%% eda findings
-
-    %% week and day cycle of electricity price
-    %% cold weather effecting consumption
-    %% connection between consumption and price
+The most important EDA findings were the expected cyclicity of consumption and thus price. An example of Consumption cyclicity can be viewed in Figure \ref{fig:consumption}. The cyclicity turned out especially beneficial when creating supportive predicitions before the final forecast. This is further detailed in Chapter \ref{section:analysis}.
 
 \subsection{Data Warehousing and Data Protection}
 \label{subsection:warehousing}
@@ -105,8 +111,6 @@ The purpose of the project and the data analysis was to create a 72-hour estimat
 \subsection{Feature Extraction}
 \label{subsection:extraction}
 
-%% time series features
-
 First, we extracted new features from datetime index itself. As electricity usage and thus market price fluctuations are cyclic and depend on time of the year, weekday, time of the day and so on, the datetime was decomposed to several new features. A rather intuitive example of how we thought these features might affect the rest of the data components is illustrated in Figure \ref{fig:components}.
 
 \begin{figure}[ht] 
@@ -116,7 +120,7 @@ First, we extracted new features from datetime index itself. As electricity usag
 \label{fig:components} 
 \end{figure}
 
-Second, lag features were extracted from the data. The data was supplemented with component values from one, two and three years ago. %% why these
+Second, lag features were extracted from the data. The data was supplemented with component values from one, two and three years ago. We settled on creating lag features for the previous years to improve the seasonality aspect in the forecast.
 
 \subsection{Time Series Prediction with XGBoost}
 \label{subsection:xgboost}
@@ -183,7 +187,9 @@ The steps are then color coded to green, yellow and red so that user can easily 
 \section{Discussion and Conclusions}
 \label{section:conclusions}
 
-In this report we have presented how data was gathered and preprocessed, how machine learning model was trained, how supplementary predictions were made and how a comprehensible prediction for the end user was derived to assist the end user to optimize their electricity usage. 
+In this report we have presented how data was gathered and preprocessed, how machine learning model was trained, how supplementary predictions were made and how a comprehensible prediction for the end user was derived to assist the end user to optimize their electricity usage. We strived to create a model that could learn the interaction between different variables that could influence the relative price of electricity, and use it to build a sensible forecast that has a prediction horizon of 72 hours.
+
+The feature importances can be seen in Figure . Unsurprisingly the Wind\_MWh and Consumption\_MWh play a big role in the training of the model. A deeper analysis of the effects of the variables would be needed to further tune the accuracy of the model.
 
 %% what was achieved
 %% what was learned
