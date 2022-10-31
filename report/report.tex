@@ -4,6 +4,7 @@
 \usepackage{amsmath}
 \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage[x11names]{xcolor}
+\usepackage{float}
 
 \hypersetup{
     colorlinks=true,
@@ -129,9 +130,7 @@ After feature extraction, the features chosen to eventually train the model were
 
 The machine learning model used for this application is the XGBoost Regressor, which is an ensemble method based on gradient-boosted decision trees. We found it to be very fast to train and very accurate. In addition we had some experience on XGBoost from previous projects. 
 
-When training the models, we used cross-validation with time series splits so that we could validate the model with real past data. An illustration of cross-validation can be seen in Appendix A, Figure \ref{fig:ts-cross-validation}.
-
-
+When training the models, we used cross-validation with time series splits so that we could validate the model with real past data. An illustration of cross-validation can be seen in Appendix A, Figure \ref{fig:ts-cross-validation}. The model was then saved to \href{https://github.com/IDS-mini/electricity/blob/main/models/xgboost_model.ubj}{xgboost\_model.ubj} to be used by the web application.
 
 \subsection{Gathering the Data for the Prediction}
 \label{subsection:datafilling}
@@ -189,7 +188,11 @@ The steps are then color coded to green, yellow and red so that user can easily 
 
 In this report we have presented how data was gathered and preprocessed, how machine learning model was trained, how supplementary predictions were made and how a comprehensible prediction for the end user was derived to assist the end user to optimize their electricity usage. We strived to create a model that could learn the interaction between different variables that could influence the relative price of electricity, and use it to build a sensible forecast that has a prediction horizon of 72 hours.
 
-The feature importances can be seen in Figure . Unsurprisingly the Wind\_MWh and Consumption\_MWh play a big role in the training of the model. A deeper analysis of the effects of the variables would be needed to further tune the accuracy of the model.
+At first, we were contemplative about the ability of the weather data, which was from Kumpula, Helsinki, to represent the whole area, as wind power production in Finland is spread around the country. The Wind\_MWh, however, together with Consumption\_MWh played a major role in the training of the model. The feature importances can be seen in Appendix \ref{section:appendixa}, Figure \ref{fig:feature-importances}. 
+
+A deeper analysis of the effects of the variables would be needed to further tune the accuracy of the model. If the model was developed further, for example more geographical weather data points and wind power plant locations could be examined. Within the existing data, more lag features could be investigated.
+
+If the application would actually be in production use, the the MLOps principles, e.g. model monitoring, to be implemented. The model should be periodically monitored for decay and retrained when necessary.
 
 %% what was achieved
 %% what was learned
